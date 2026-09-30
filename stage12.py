@@ -15,7 +15,7 @@ from urllib.request import urlopen
 import numpy as np
 from PIL import Image
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "jev-omni-q4"))
 from jev_omni_gguf_decide import decide, post_json  # noqa: E402
 
@@ -112,6 +112,11 @@ def tiles(img):
     return out
 
 
+def rel(p) -> str:
+    """Repo-relative path for CSV/npz keys, so results survive moving the repo."""
+    return Path(p).relative_to(ROOT).as_posix()
+
+
 def split(cat):
     """Interleaved dev/holdout split by sorted filename (identical to the data/screw_dev|hold folders used in 5.1)."""
     rows = []
@@ -129,7 +134,7 @@ def run_config(name, cat, rows, fn):
     for i, r in enumerate(rows, 1):
         t0 = time.perf_counter()
         score, extra = fn(r)
-        res.append(dict(path=str(r["path"]), label=r["label"], defect=r["defect"], split=r["split"],
+        res.append(dict(path=rel(r["path"]), label=r["label"], defect=r["defect"], split=r["split"],
                         score=float(score), time_s=time.perf_counter() - t0, **extra))
         if i % 40 == 0:
             print(f"  {name}/{cat} {i}/{len(rows)}", flush=True)
@@ -179,11 +184,11 @@ def main():
             return p[order.index("Anomalous")], h
 
         def c_base(r):
-            s, h = two(r["path"], cfg["base"]); feats.setdefault("base", {})[str(r["path"])] = h
+            s, h = two(r["path"], cfg["base"]); feats.setdefault("base", {})[rel(r["path"])] = h
             return s, {}
 
         def c_detail(r):
-            s, h = two(r["path"], cfg["detail"]); feats.setdefault("detail", {})[str(r["path"])] = h
+            s, h = two(r["path"], cfg["detail"]); feats.setdefault("detail", {})[rel(r["path"])] = h
             return s, {}
 
         def c_up(r):
@@ -223,7 +228,7 @@ def main():
                 H.append(jev(f, *cfg["detail"], ["Normal", "Anomalous"])[1])
                 if i % 80 == 0:
                     print(f"  train features {cat} {i}/{len(files)}", flush=True)
-            np.savez(tr, paths=np.array([str(f) for f in files]), H=np.stack(H))
+            np.savez(tr, paths=np.array([rel(f) for f in files]), H=np.stack(H))
 
     (OUT / "summary_stage1.json").write_text(json.dumps(summary, indent=1))
 

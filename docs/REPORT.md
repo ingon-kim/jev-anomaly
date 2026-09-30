@@ -168,7 +168,7 @@ holdout 결과:
 ## 7. 재현
 
 ```bash
-cd ~/jev-anomaly
+cd jev-anomaly                               # repo root
 ./restart_server.sh --no-mmproj-offload      # 반드시 이 옵션 (NaN 이슈)
 .venv/bin/python eval_anomaly.py --data data/screw \
   --state "The image shows a screw photographed for industrial visual inspection." \

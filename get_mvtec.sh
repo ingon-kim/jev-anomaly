@@ -8,7 +8,7 @@ for c in bottle screw carpet; do
   mkdir -p data/$c/normal data/$c/anomaly
   for d in mvtec_raw/images/test/$c/*; do
     dn=$(basename "$d"); [ "$dn" = good ] && dst=normal || dst=anomaly
-    for f in "$d"/*.png; do ln -sf "$PWD/$f" "data/$c/$dst/${dn}_$(basename "$f")"; done
+    for f in "$d"/*.png; do ln -sfr "$f" "data/$c/$dst/${dn}_$(basename "$f")"; done  # relative links survive moving the repo
   done
 done
 for c in bottle screw; do
