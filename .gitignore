@@ -1,0 +1,17 @@
+# big / downloaded / built
+.venv/
+llama.cpp/
+llama.cpp-latest/
+jev-omni-q4/
+jev-omni-src/
+mvtec_raw/
+data/
+cache/
+# run outputs (MVTec-derived, local paths)
+results/
+demo_*.mp4
+explain.html
+*.log
+__pycache__/
+scratch_*
+latest_rev.txt
