@@ -14,7 +14,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
 from eval_anomaly import auroc
-from stage12 import HEAD, OUT, rel, split, summarize
+from stage12 import HEAD, OUT, split, summarize
 
 
 def load(name):
@@ -31,13 +31,13 @@ def main():
     for cat in ("screw", "bottle"):
         rows = split(cat)
         feats = load(f"hidden_detail_{cat}.npz")
-        X = std(np.stack([feats[rel(r["path"])] for r in rows]))
+        X = std(np.stack([feats[r["key"]] for r in rows]))
         y = np.array([r["label"] for r in rows])
         dev = np.array([r["split"] == "dev" for r in rows])
         tr = std(np.load(OUT / f"hidden_detail_train_{cat}.npz")["H"])
 
         def save(name, scores):
-            res = [dict(path=rel(r["path"]), label=r["label"], defect=r["defect"], split=r["split"], score=float(s), time_s=0.0)
+            res = [dict(path=r["key"], label=r["label"], defect=r["defect"], split=r["split"], score=float(s), time_s=0.0)
                    for r, s in zip(rows, scores)]
             with (OUT / f"{name}_{cat}.csv").open("w", newline="") as fh:
                 w = csv.DictWriter(fh, fieldnames=res[0].keys())

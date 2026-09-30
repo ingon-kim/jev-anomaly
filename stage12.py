@@ -123,7 +123,7 @@ def split(cat):
     for label, sub in ((0, "normal"), (1, "anomaly")):
         files = sorted((ROOT / "data" / cat / sub).glob("*.png"))
         for i, f in enumerate(files):
-            rows.append(dict(path=f, label=label, defect=f.stem.rsplit("_", 1)[0], split="dev" if i % 2 == 0 else "hold"))
+            rows.append(dict(path=f, key=rel(f), label=label, defect=f.stem.rsplit("_", 1)[0], split="dev" if i % 2 == 0 else "hold"))
     return rows
 
 
@@ -134,7 +134,7 @@ def run_config(name, cat, rows, fn):
     for i, r in enumerate(rows, 1):
         t0 = time.perf_counter()
         score, extra = fn(r)
-        res.append(dict(path=rel(r["path"]), label=r["label"], defect=r["defect"], split=r["split"],
+        res.append(dict(path=r["key"], label=r["label"], defect=r["defect"], split=r["split"],
                         score=float(score), time_s=time.perf_counter() - t0, **extra))
         if i % 40 == 0:
             print(f"  {name}/{cat} {i}/{len(rows)}", flush=True)
@@ -184,11 +184,11 @@ def main():
             return p[order.index("Anomalous")], h
 
         def c_base(r):
-            s, h = two(r["path"], cfg["base"]); feats.setdefault("base", {})[rel(r["path"])] = h
+            s, h = two(r["path"], cfg["base"]); feats.setdefault("base", {})[r["key"]] = h
             return s, {}
 
         def c_detail(r):
-            s, h = two(r["path"], cfg["detail"]); feats.setdefault("detail", {})[rel(r["path"])] = h
+            s, h = two(r["path"], cfg["detail"]); feats.setdefault("detail", {})[r["key"]] = h
             return s, {}
 
         def c_up(r):
