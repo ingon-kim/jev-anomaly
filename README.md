@@ -28,7 +28,7 @@ Image anomaly detection based on Jev-Omni (Q4_K_M GGUF, llama.cpp, single local 
 ## Quick start
 
 ```bash
-git clone https://github.com/ingon1026/jev-anomaly.git && cd jev-anomaly
+git clone https://github.com/ingon-kim/jev-anomaly.git && cd jev-anomaly
 ./setup.sh        # venv, llama.cpp CUDA build, model download (7 GB), SHA-256 check
 ./get_mvtec.sh    # optional: MVTec AD samples for the app and eval scripts
 ./run.sh          # llama-server + app, http://127.0.0.1:7860
